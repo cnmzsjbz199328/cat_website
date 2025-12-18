@@ -39,3 +39,10 @@ export interface FavoriteItem {
   slug: string;
   timestamp: number;
 }
+
+export interface BreedsLoadState {
+  status: 'idle' | 'loading' | 'success' | 'error';
+  error?: string;
+  lastFetched?: number;
+  breeds: Breed[];
+}

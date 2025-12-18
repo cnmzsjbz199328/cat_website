@@ -1,12 +1,35 @@
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, Cat, ArrowRight, Trash2 } from 'lucide-react';
-import { CURATED_BREEDS } from '../constants';
-import { FavoriteItem } from '../types';
+import { FavoriteItem, Breed } from '../types';
+import { catService } from '../services/catService';
 
 export default function Favorites({ favorites, toggleFavorite }: { favorites: FavoriteItem[], toggleFavorite: (slug: string) => void }) {
-  const favoriteBreeds = CURATED_BREEDS.filter(b => favorites.some(f => f.slug === b.slug));
+  const [allBreeds, setAllBreeds] = useState<Breed[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    catService.getAllBreeds().then(breeds => {
+      setAllBreeds(breeds);
+      setLoading(false);
+    }).catch(err => {
+      console.error('Error loading breeds:', err);
+      setLoading(false);
+    });
+  }, []);
+
+  const favoriteBreeds = allBreeds.filter(b => favorites.some(f => f.slug === b.slug));
+
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="flex items-center justify-center min-h-96">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">

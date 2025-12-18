@@ -1,9 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// Added Cat to the list of imports from lucide-react
 import { Heart, ChevronLeft, Info, Activity, ShieldCheck, MapPin, Clock, Star, Zap, Droplets, Smile, MessageSquare, Brain, Cat } from 'lucide-react';
-import { CURATED_BREEDS } from '../constants';
 import { catService } from '../services/catService';
 import { Breed, CatImage, FavoriteItem } from '../types';
 
@@ -36,28 +34,65 @@ export default function BreedDetail({ favorites, toggleFavorite, addToHistory }:
   const [breed, setBreed] = useState<Breed | null>(null);
   const [images, setImages] = useState<CatImage[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [activeImg, setActiveImg] = useState(0);
 
   const isFavorite = favorites.some(f => f.slug === slug);
 
   useEffect(() => {
-    const found = CURATED_BREEDS.find(b => b.slug === slug);
-    if (found) {
-      setBreed(found);
-      addToHistory(found.slug);
-      setLoading(true);
-      catService.getBreedImages(found.theCatApiBreedId, 6).then(imgs => {
+    const loadBreedDetail = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        if (!slug) {
+          setError('Breed not found');
+          return;
+        }
+
+        const foundBreed = await catService.getBreed(slug);
+        if (!foundBreed) {
+          setError('Breed not found');
+          return;
+        }
+
+        setBreed(foundBreed);
+        addToHistory(foundBreed.slug);
+
+        // 获取品种图片
+        const imgs = await catService.getBreedImages(foundBreed.theCatApiBreedId, 6);
         setImages(imgs);
+      } catch (err) {
+        setError('Failed to load breed details');
+        console.error('Error loading breed:', err);
+      } finally {
         setLoading(false);
-      });
-    }
+      }
+    };
+
+    loadBreedDetail();
   }, [slug]);
 
-  if (!breed) return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+      </div>
+    );
+  }
+
+  if (error || !breed) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+          <p className="text-red-700 font-semibold mb-4">{error || 'Breed not found'}</p>
+          <Link to="/breeds" className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 inline-block">
+            Back to Breeds
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
@@ -163,7 +198,7 @@ export default function BreedDetail({ favorites, toggleFavorite, addToHistory }:
       <div className="mt-20">
         <h2 className="text-3xl font-bold text-gray-900 mb-12 flex items-center gap-3">
           <BookOpen className="text-amber-600" />
-          Habits & Professional Care
+          Habits & Care
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Section icon={Activity} title="Exercise & Play" content={breed.habitsCare.exercise} />

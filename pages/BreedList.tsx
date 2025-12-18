@@ -1,8 +1,7 @@
 
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { Filter, Search, ChevronRight, Star, Cat } from 'lucide-react';
-import { CURATED_BREEDS } from '../constants';
 import { Breed, CatImage } from '../types';
 import { catService } from '../services/catService';
 
@@ -13,9 +12,31 @@ export default function BreedList() {
 
   const [query, setQuery] = useState(initialQuery);
   const [selectedCoat, setSelectedCoat] = useState<string>('All');
-  
+  const [breeds, setBreeds] = useState<Breed[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 加载所有品种
+  useEffect(() => {
+    const loadBreeds = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const data = await catService.getAllBreeds();
+        setBreeds(data);
+      } catch (err) {
+        setError('Failed to load cat breeds. Please try again later.');
+        console.error('Error loading breeds:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadBreeds();
+  }, []);
+
   const filteredBreeds = useMemo(() => {
-    return CURATED_BREEDS.filter(breed => {
+    return breeds.filter(breed => {
       const matchesSearch = breed.displayNameEn.toLowerCase().includes(query.toLowerCase()) || 
                             breed.temperament.some(t => t.toLowerCase().includes(query.toLowerCase()));
       const matchesCoat = selectedCoat === 'All' || breed.coat === selectedCoat;
@@ -29,14 +50,31 @@ export default function BreedList() {
 
       return matchesSearch && matchesCoat && matchesTrait;
     });
-  }, [query, selectedCoat, initialTrait]);
+  }, [query, selectedCoat, initialTrait, breeds]);
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 py-12">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-8 text-center">
+          <p className="text-red-700 font-semibold mb-4">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
       <div className="mb-12">
         <h1 className="text-4xl font-extrabold text-gray-900 mb-4">Cat Breeds A-Z</h1>
         <p className="text-gray-500 max-w-2xl">
-          Discover our curated database of common domestic cat breeds. Filter by physical traits or temperament.
+          Discover our comprehensive database of cat breeds. Filter by physical traits or temperament.
+          {!loading && <span className="ml-2 font-semibold">({breeds.length} breeds available)</span>}
         </p>
       </div>
 
@@ -89,7 +127,11 @@ export default function BreedList() {
 
         {/* Breed Grid */}
         <div className="flex-1">
-          {filteredBreeds.length > 0 ? (
+          {loading ? (
+            <div className="flex items-center justify-center min-h-96">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+            </div>
+          ) : filteredBreeds.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredBreeds.map((breed) => (
                 <BreedCard key={breed.id} breed={breed} />

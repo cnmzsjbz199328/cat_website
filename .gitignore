@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Temporary and backup files
+*.tmp
+*.bak
+*.cache
+*.pid
+
+# Windows executables and libraries
+*.exe
+*.dll
+
+# Build artifacts
+*.obj
+*.pdb
+
+# Local test scripts
+test_breeds.sh
+test-api.ps1

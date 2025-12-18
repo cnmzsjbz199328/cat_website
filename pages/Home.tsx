@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 // Added BookOpen to the lucide-react imports
 import { Search, Sparkles, Zap, Heart, Wind, Volume2, ArrowRight, Cat, BookOpen } from 'lucide-react';
-import { CURATED_BREEDS } from '../constants';
+import { Breed, CatImage } from '../types';
 import { catService } from '../services/catService';
 
 const FeatureCard = ({ icon: Icon, title, desc, color }: any) => (
@@ -32,10 +32,36 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [dailyCat, setDailyCat] = useState('');
+  const [allBreeds, setAllBreeds] = useState<Breed[]>([]);
+  const [breedImages, setBrédImages] = useState<Record<string, CatImage>>({});
 
   useEffect(() => {
     catService.getRandomCat().then(setDailyCat);
+    
+    // 加载所有品种
+    catService.getAllBreeds().then(setAllBreeds);
   }, []);
+
+  // 获取最近查看的品种的图片
+  useEffect(() => {
+    const loadHistoryImages = async () => {
+      const images: Record<string, CatImage> = {};
+      for (const slug of recentlyViewed.slice(0, 4)) {
+        const breed = allBreeds.find(b => b.slug === slug);
+        if (breed) {
+          const imgs = await catService.getBreedImages(breed.theCatApiBreedId, 1);
+          if (imgs.length > 0) {
+            images[slug] = imgs[0];
+          }
+        }
+      }
+      setBrédImages(images);
+    };
+    
+    if (allBreeds.length > 0) {
+      loadHistoryImages();
+    }
+  }, [allBreeds, recentlyViewed]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,7 +70,7 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
     }
   };
 
-  const historyBreeds = CURATED_BREEDS.filter(b => recentlyViewed.includes(b.slug));
+  const historyBreeds = allBreeds.filter(b => recentlyViewed.includes(b.slug));
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-10 md:py-20">
@@ -59,7 +85,7 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
             The Ultimate <span className="text-amber-600">Cat Breed</span> Encyclopedia
           </h1>
           <p className="text-xl text-gray-500 mb-10 max-w-2xl">
-            Explore 60+ breeds with curated care guides, temperament analysis, and professional-grade photography.
+            Explore {allBreeds.length}+ cat breeds with detailed information, temperament analysis, and professional photography.
           </p>
 
           <form onSubmit={handleSearch} className="relative max-w-xl group">
@@ -129,11 +155,17 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
                 <div className="absolute bottom-4 left-4 z-20">
                   <p className="text-white font-bold">{breed.displayNameEn}</p>
                 </div>
-                <img 
-                  src={`https://picsum.photos/seed/${breed.slug}/400/400`} 
-                  alt={breed.displayNameEn}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
+                {breedImages[breed.slug] ? (
+                  <img 
+                    src={breedImages[breed.slug].url} 
+                    alt={breed.displayNameEn}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <Cat size={32} className="text-gray-400 animate-pulse" />
+                  </div>
+                )}
               </Link>
             ))}
           </div>
