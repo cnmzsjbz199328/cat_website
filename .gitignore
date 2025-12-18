@@ -38,5 +38,5 @@ dist-ssr
 *.pdb
 
 # Local test scripts
-test_breeds.sh
-test-api.ps1
+test_*.sh
+test-*.ps1
