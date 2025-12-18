@@ -1,9 +1,10 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
-import { Filter, Search, ChevronRight, Star } from 'lucide-react';
+import { Filter, Search, ChevronRight, Star, Cat } from 'lucide-react';
 import { CURATED_BREEDS } from '../constants';
-import { Breed } from '../types';
+import { Breed, CatImage } from '../types';
+import { catService } from '../services/catService';
 
 export default function BreedList() {
   const [searchParams] = useSearchParams();
@@ -116,17 +117,42 @@ export default function BreedList() {
 }
 
 const BreedCard = ({ breed }: { breed: Breed }) => {
+  const [image, setImage] = useState<CatImage | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchImage = async () => {
+      setLoading(true);
+      const images = await catService.getBreedImages(breed.theCatApiBreedId, 1);
+      if (images.length > 0) {
+        setImage(images[0]);
+      }
+      setLoading(false);
+    };
+    fetchImage();
+  }, [breed.theCatApiBreedId]);
+
   return (
     <Link 
       to={`/breed/${breed.slug}`}
       className="group bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm hover:shadow-xl transition-all hover:-translate-y-1 flex flex-col"
     >
-      <div className="aspect-[4/3] overflow-hidden relative">
-        <img 
-          src={`https://picsum.photos/seed/${breed.slug}/600/400`} 
-          alt={breed.displayNameEn}
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-        />
+      <div className="aspect-[4/3] rounded-3xl overflow-hidden bg-gray-100 mb-4 relative">
+        {loading ? (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <Cat size={40} className="text-gray-300 animate-pulse" />
+          </div>
+        ) : image ? (
+          <img 
+            src={image.url}
+            alt={breed.displayNameEn}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <Cat size={40} className="text-gray-300" />
+          </div>
+        )}
         <div className="absolute top-3 right-3 bg-white/90 backdrop-blur px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider text-amber-600">
           {breed.coat}
         </div>
