@@ -139,7 +139,7 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
             </p>
             
             {/* English Text */}
-            <p className={`text-gray-700 leading-relaxed absolute inset-0 px-2 py-0 transition-opacity duration-700 text-left text-sm md:text-base lg:text-lg ${
+            <p className={`text-gray-700 leading-relaxed absolute inset-0 px-2 py-1.5 transition-opacity duration-700 text-left text-sm md:text-base lg:text-lg ${
               isHoveringDobby ? 'opacity-100' : 'opacity-0'
             }`}>
               <span className="font-bold text-amber-600">In loving memory of Dobby</span> - named after the loyal house-elf from Harry Potter. Dobby's owner cherished him deeply, though sadly wasn't by his side at the end. Life is filled with such sorrows, yet this is the nature of all things. To be loved and cherished in life, and remembered fondly after - that is a rare blessing. We hope Dobby's owner finds courage to look forward, and wish all creatures, including beloved Dobby, the gentle care and affection they deserve.
