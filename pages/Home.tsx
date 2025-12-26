@@ -17,14 +17,12 @@ const FeatureCard = ({ icon: Icon, title, desc, color }: any) => (
 );
 
 const CategoryButton = ({ icon: Icon, label, color, onClick }: any) => (
-  <button 
+  <button
     onClick={onClick}
-    className="flex flex-col items-center gap-3 group"
+    className={`inline-flex items-center gap-2 px-3 py-2 rounded-full font-medium text-sm transition-colors bg-white border border-gray-200 hover:${color} hover:bg-opacity-10 hover:border-current group`}
   >
-    <div className={`w-16 h-16 md:w-20 md:h-20 rounded-3xl ${color} flex items-center justify-center transition-transform group-hover:scale-110 shadow-lg`}>
-      <Icon size={32} className="text-white" />
-    </div>
-    <span className="text-sm font-semibold text-gray-700">{label}</span>
+    <Icon size={16} className="flex-shrink-0 text-gray-700 group-hover:text-current transition-colors" />
+    <span className="text-gray-800 group-hover:text-current transition-colors">{label}</span>
   </button>
 );
 
@@ -147,19 +145,7 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
             </p>
           </div>
 
-          <form onSubmit={handleSearch} className="relative max-w-xl group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-amber-500 transition-colors" size={24} />
-            <input
-              type="text"
-              placeholder="Search breeds (e.g. Siamese, Bengal...)"
-              className="w-full pl-14 pr-32 py-5 rounded-2xl border-2 border-gray-100 focus:border-amber-500 focus:outline-none text-lg shadow-sm transition-all"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button className="absolute right-3 top-3 bottom-3 bg-amber-600 text-white px-6 rounded-xl font-bold hover:bg-amber-700 transition-colors">
-              Find
-            </button>
-          </form>
+
         </div>
 
         <div className="flex-1 relative w-full max-w-md">
@@ -212,10 +198,28 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
         </div>
       </div>
 
+      {/* Search Bar Section */}
+      <div className="mb-0">
+        <form onSubmit={handleSearch} className="relative max-w-xl mx-auto mb-6 group flex items-center gap-2">
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-amber-500 transition-colors">
+            <Search size={20} />
+          </span>
+          <input
+            type="text"
+            placeholder="Search breeds (e.g. Siamese, Bengal...)"
+            className="w-full pl-12 pr-24 py-3 rounded-xl border border-gray-200 focus:border-amber-500 focus:outline-none text-base shadow-sm transition-all"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-amber-600 text-white px-4 py-1.5 rounded-lg font-semibold text-base hover:bg-amber-700 transition-colors">
+            Find
+          </button>
+        </form>
+      </div>
+
       {/* Categories */}
-      <div className="mb-24">
-        <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Browse by Personality</h2>
-        <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+      <div className="mb-24 flex items-center justify-center gap-8 flex-wrap">
+        <div className="flex flex-wrap justify-center gap-1">
           <CategoryButton icon={Zap} label="High Energy" color="bg-orange-500" onClick={() => navigate('/breeds?trait=energy')} />
           <CategoryButton icon={Heart} label="Affectionate" color="bg-rose-500" onClick={() => navigate('/breeds?trait=affection')} />
           <CategoryButton icon={BookOpen} label="Intelligent" color="bg-blue-500" onClick={() => navigate('/breeds?trait=intelligence')} />
