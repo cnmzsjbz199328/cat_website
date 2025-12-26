@@ -113,7 +113,7 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
   const historyBreeds = allBreeds.filter(b => recentlyViewed.includes(b.slug));
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-10 md:py-20">
+    <div className="max-w-7xl mx-auto px-2.5 py-10 md:py-20">
       {/* Hero Section */}
       <div className="flex flex-col lg:flex-row items-center gap-12 mb-24">
         <div className="flex-1 text-center lg:text-left">
@@ -132,14 +132,14 @@ export default function Home({ recentlyViewed }: { recentlyViewed: string[] }) {
             onMouseLeave={() => setIsHoveringDobby(false)}
           >
             {/* Chinese Text */}
-            <p className={`text-gray-700 leading-relaxed absolute inset-0 p-4 transition-opacity duration-700 text-left text-base md:text-lg ${
+            <p className={`text-gray-700 leading-relaxed absolute inset-0 px-2.5 py-1.5 transition-opacity duration-700 text-left text-base md:text-lg ${
               isHoveringDobby ? 'opacity-0' : 'opacity-100'
             }`}>
               <span className="font-bold text-amber-600">怀念哆比</span> - 哆比的名字来源于《哈利波特》中忠诚的家养小精灵。哆比的主人深深地爱着它，但遗憾的是在它去世时没能陪伴在身边。人世间的事，遗憾多有。但万物皆是如此，生前有人尊重和怜爱，死后有人怀念，已经是难得的幸福。希望失去孩子的主人可以勇敢地看向前方，也希望包括小猫在内的所有生命都能得到温柔的对待。
             </p>
             
             {/* English Text */}
-            <p className={`text-gray-700 leading-relaxed absolute inset-0 p-4 transition-opacity duration-700 text-left text-sm md:text-base lg:text-lg ${
+            <p className={`text-gray-700 leading-relaxed absolute inset-0 px-2 py-0 transition-opacity duration-700 text-left text-sm md:text-base lg:text-lg ${
               isHoveringDobby ? 'opacity-100' : 'opacity-0'
             }`}>
               <span className="font-bold text-amber-600">In loving memory of Dobby</span> - named after the loyal house-elf from Harry Potter. Dobby's owner cherished him deeply, though sadly wasn't by his side at the end. Life is filled with such sorrows, yet this is the nature of all things. To be loved and cherished in life, and remembered fondly after - that is a rare blessing. We hope Dobby's owner finds courage to look forward, and wish all creatures, including beloved Dobby, the gentle care and affection they deserve.
